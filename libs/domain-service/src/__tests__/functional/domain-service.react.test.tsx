@@ -2,7 +2,7 @@ import React from "react";
 import "@testing-library/jest-dom";
 import { renderHook } from "@testing-library/react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { DomainEmpty, InvalidDomain, NoResolution } from "../../errors";
+import { DomainEmpty, NoResolution } from "../../errors";
 import { resolveAddress, resolveDomain } from "../../resolvers";
 import { DomainServiceProvider, useDomain } from "../../hooks";
 import { DomainServiceResolution } from "../../types";
@@ -84,15 +84,16 @@ describe("useDomain", () => {
     await waitFor(() => expect(result.current.error).toBeInstanceOf(NoResolution));
   });
 
-  it("should return an error when the input has a forward registry but content is invalid", async () => {
+  it("should attempt resolution for domains with unicode or special chars", async () => {
     const { result } = renderHook(useDomain, {
       initialProps: "not|valid|👋.eth",
       wrapper,
     });
 
     await waitFor(() => result.current.status === "error");
+    // resolution is attempted but no result is found from the backend
     // @ts-expect-error no type guard
-    await waitFor(() => expect(result.current.error).toBeInstanceOf(InvalidDomain));
+    await waitFor(() => expect(result.current.error).toBeInstanceOf(NoResolution));
   });
 
   it("should return a successful forward resolution", async () => {

@@ -7,8 +7,12 @@ describe("Domain Service", () => {
         expect(await getRegistriesForDomain("vitalik.eth")).toHaveLength(1);
       });
 
-      it("should return an empty array for an unsupported domain", async () => {
-        expect(await getRegistriesForDomain("vitalik.notsupport")).toHaveLength(0);
+      it("should return a registry for a DNS name imported into ENS", async () => {
+        expect(await getRegistriesForDomain("ensfairy.xyz")).toHaveLength(1);
+        expect(await getRegistriesForDomain("ses.fkey.id")).toHaveLength(1);
+      });
+
+      it("should return an empty array for a string without a dot", async () => {
         expect(await getRegistriesForDomain("vitaliketh")).toHaveLength(0);
       });
     });

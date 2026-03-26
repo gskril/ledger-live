@@ -1,4 +1,4 @@
-import { validateDomain } from "../../utils/index";
+import { isDomainLike, validateDomain } from "../../utils/index";
 
 // List of characters that are accepted as part of a domain
 const validCharCodes = (() => {
@@ -29,6 +29,40 @@ const validCharCodes = (() => {
 
 describe("Domain Service", () => {
   describe("Utils", () => {
+    describe("isDomainLike", () => {
+      it("should return true for .eth names", () => {
+        expect(isDomainLike("vitalik.eth")).toBe(true);
+      });
+
+      it("should return true for DNS names", () => {
+        expect(isDomainLike("ensfairy.xyz")).toBe(true);
+        expect(isDomainLike("example.com")).toBe(true);
+      });
+
+      it("should return true for subdomains", () => {
+        expect(isDomainLike("ses.fkey.id")).toBe(true);
+        expect(isDomainLike("sub.vitalik.eth")).toBe(true);
+      });
+
+      it("should return false for strings without a dot", () => {
+        expect(isDomainLike("vitaliketh")).toBe(false);
+      });
+
+      it("should return false for strings that are too short", () => {
+        expect(isDomainLike("a.")).toBe(false);
+        expect(isDomainLike("ab")).toBe(false);
+      });
+
+      it("should return false for non-string inputs", () => {
+        expect(isDomainLike(undefined)).toBe(false);
+        expect(isDomainLike({ domain: "vitalik.eth" } as any)).toBe(false);
+      });
+
+      it("should return true for emoji domains", () => {
+        expect(isDomainLike("🦇🔊.eth")).toBe(true);
+      });
+    });
+
     describe("validateDomain", () => {
       it("should return true for a valid domain", () => {
         expect(validateDomain("vitalik.eth")).toBe(true);

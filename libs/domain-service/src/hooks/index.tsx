@@ -3,7 +3,6 @@ import { resolveAddress, resolveDomain } from "../resolvers";
 import { getRegistriesForAddress } from "../registries";
 import { getRegistriesForDomain } from "../registries";
 import { SupportedRegistries } from "../types";
-import { validateDomain } from "../utils";
 import { isOutdated } from "./logic";
 import {
   DomainServiceContextAPI,
@@ -11,7 +10,7 @@ import {
   DomainServiceContextType,
   DomainServiceStatus,
 } from "./types";
-import { DomainEmpty, InvalidDomain, NoResolution, UnsupportedDomainOrAddress } from "../errors";
+import { DomainEmpty, NoResolution, UnsupportedDomainOrAddress } from "../errors";
 
 const DomainServiceContext = createContext<DomainServiceContextType>({
   cache: {},
@@ -55,16 +54,6 @@ export const useDomain = (
         setState({
           status: "error",
           error: new UnsupportedDomainOrAddress(),
-          updatedAt: Date.now(),
-        });
-        return;
-      }
-
-      // if it's a domain but the domain is not respecting our security rules
-      if (forwardRegistries.length && !validateDomain(addressOrDomainLC)) {
-        setState({
-          status: "error",
-          error: new InvalidDomain(),
           updatedAt: Date.now(),
         });
         return;

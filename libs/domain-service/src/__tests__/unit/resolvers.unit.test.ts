@@ -13,6 +13,9 @@ describe("Domain Service", () => {
           if (url?.endsWith("vitalik.eth")) {
             return { data: "0x123" } as any;
           }
+          if (url?.endsWith("ensfairy.xyz")) {
+            return { data: "0x456" } as any;
+          }
           return Promise.reject({ response: { status: 404 } }) as any;
         });
       });
@@ -36,6 +39,18 @@ describe("Domain Service", () => {
             registry: "ens",
             address: "0x123",
             domain: "vitalik.eth",
+            type: "forward",
+          },
+        ]);
+      });
+
+      it("should resolve a DNS name imported into ENS", async () => {
+        const resolutions = await resolveDomain("ensfairy.xyz");
+        expect(resolutions).toEqual([
+          {
+            registry: "ens",
+            address: "0x456",
+            domain: "ensfairy.xyz",
             type: "forward",
           },
         ]);
