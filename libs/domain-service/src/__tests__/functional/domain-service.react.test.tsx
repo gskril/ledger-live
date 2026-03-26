@@ -54,9 +54,10 @@ describe("useDomain", () => {
     });
   });
 
+  // Test names sourced from https://github.com/ensdomains/resolution-tests
   it("should be queued", async () => {
     const { result } = renderHook(useDomain, {
-      initialProps: "vitalik.eth",
+      initialProps: "ur.integration-tests.eth",
     });
 
     expect(result.current.status).toBe("queued");
@@ -96,12 +97,12 @@ describe("useDomain", () => {
     await waitFor(() => expect(result.current.error).toBeInstanceOf(NoResolution));
   });
 
-  it("should return a successful forward resolution", async () => {
+  it("should return a successful forward resolution for an onchain .eth name", async () => {
     const resolutions: DomainServiceResolution[] = [
       {
-        address: "forced mocked address",
+        address: "0x2222222222222222222222222222222222222222",
         registry: "ens",
-        domain: "vitalik.eth",
+        domain: "ur.integration-tests.eth",
         type: "forward",
       },
     ];
@@ -109,7 +110,43 @@ describe("useDomain", () => {
 
     render(
       <DomainServiceProvider>
-        <CustomTest str="vitalik.eth" />
+        <CustomTest str="ur.integration-tests.eth" />
+      </DomainServiceProvider>,
+    );
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("status").textContent).toBe("loaded");
+      },
+      { timeout: 5000 },
+    );
+
+    expect(screen.getByTestId("status").textContent).toBe("loaded");
+    expect(screen.getByTestId("resolutions")).toBeInTheDocument();
+    resolutions.forEach((resolution, index) => {
+      resolutionKeys.forEach(field => {
+        expect(screen.getByTestId("resolutions")).toContainElement(
+          screen.getByTestId(`${index}-${field}`),
+        );
+        expect(screen.getByTestId(`${index}-${field}`).textContent).toBe(resolution[field]);
+      });
+    });
+  });
+
+  it("should return a successful forward resolution for a DNS name", async () => {
+    const resolutions: DomainServiceResolution[] = [
+      {
+        address: "0x534631Bcf33BDb069fB20A93d2fdb9e4D4dD42CF",
+        registry: "ens",
+        domain: "pokersback.com",
+        type: "forward",
+      },
+    ];
+    mockedResolvedDomain.mockImplementationOnce(async () => resolutions);
+
+    render(
+      <DomainServiceProvider>
+        <CustomTest str="pokersback.com" />
       </DomainServiceProvider>,
     );
 
@@ -135,9 +172,9 @@ describe("useDomain", () => {
   it("should return a successful reverse resolution", async () => {
     const reverseResolutions: DomainServiceResolution[] = [
       {
-        domain: "vitalik.eth",
+        domain: "devrel.enslabs.eth",
         registry: "ens",
-        address: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        address: "0xeE9eeaAB0Bb7D9B969D701f6f8212609EDeA252E",
         type: "reverse",
       },
     ];
@@ -145,7 +182,7 @@ describe("useDomain", () => {
 
     render(
       <DomainServiceProvider>
-        <CustomTest str="0xd8da6bf26964af9d7eed9e03e53415d37aa96045" />
+        <CustomTest str="0xeE9eeaAB0Bb7D9B969D701f6f8212609EDeA252E" />
       </DomainServiceProvider>,
     );
 

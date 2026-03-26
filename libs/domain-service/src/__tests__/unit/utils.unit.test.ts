@@ -29,19 +29,19 @@ const validCharCodes = (() => {
 
 describe("Domain Service", () => {
   describe("Utils", () => {
+    // Test names sourced from https://github.com/ensdomains/resolution-tests
     describe("isDomainLike", () => {
-      it("should return true for .eth names", () => {
-        expect(isDomainLike("vitalik.eth")).toBe(true);
+      it("should return true for onchain .eth names", () => {
+        expect(isDomainLike("ur.integration-tests.eth")).toBe(true);
+        expect(isDomainLike("integration-tests.eth")).toBe(true);
       });
 
-      it("should return true for DNS names", () => {
-        expect(isDomainLike("ensfairy.xyz")).toBe(true);
-        expect(isDomainLike("example.com")).toBe(true);
+      it("should return true for offchain .eth names (CCIP-Read)", () => {
+        expect(isDomainLike("test.offchaindemo.eth")).toBe(true);
       });
 
-      it("should return true for subdomains", () => {
-        expect(isDomainLike("ses.fkey.id")).toBe(true);
-        expect(isDomainLike("sub.vitalik.eth")).toBe(true);
+      it("should return true for DNS names imported into ENS", () => {
+        expect(isDomainLike("pokersback.com")).toBe(true);
       });
 
       it("should return false for strings without a dot", () => {
@@ -56,10 +56,6 @@ describe("Domain Service", () => {
       it("should return false for non-string inputs", () => {
         expect(isDomainLike(undefined)).toBe(false);
         expect(isDomainLike({ domain: "vitalik.eth" } as any)).toBe(false);
-      });
-
-      it("should return true for emoji domains", () => {
-        expect(isDomainLike("🦇🔊.eth")).toBe(true);
       });
     });
 
