@@ -24,7 +24,25 @@ export const allSettled = <T>(promises: Promise<T>[]): Promise<PromiseResult<T>[
 };
 
 /**
- * Helper to know in advance if a domain is compatible with the nano
+ * Check if a string looks like a domain name (contains at least one dot with
+ * characters on both sides). This is intentionally broad to support both .eth
+ * names and DNS names imported into ENS (e.g. ensfairy.xyz, ses.fkey.id).
+ *
+ * @param input string to check
+ * @returns {Boolean}
+ */
+export const isDomainLike = (input: string | undefined): boolean => {
+  if (typeof input !== "string") {
+    return false;
+  }
+
+  return input.includes(".") && input.length > 2;
+};
+
+/**
+ * Helper to know in advance if a domain is compatible with the nano.
+ * This checks for ASCII-only characters and a max length of 29 characters,
+ * which are hardware wallet display constraints.
  *
  * @param domain string representing the domain
  * @returns {Boolean}

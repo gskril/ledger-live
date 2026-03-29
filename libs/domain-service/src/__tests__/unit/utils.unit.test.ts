@@ -1,4 +1,4 @@
-import { validateDomain } from "../../utils/index";
+import { isDomainLike, validateDomain } from "../../utils/index";
 
 // List of characters that are accepted as part of a domain
 const validCharCodes = (() => {
@@ -29,6 +29,36 @@ const validCharCodes = (() => {
 
 describe("Domain Service", () => {
   describe("Utils", () => {
+    // Test names sourced from https://github.com/ensdomains/resolution-tests
+    describe("isDomainLike", () => {
+      it("should return true for onchain .eth names", () => {
+        expect(isDomainLike("ur.integration-tests.eth")).toBe(true);
+        expect(isDomainLike("integration-tests.eth")).toBe(true);
+      });
+
+      it("should return true for offchain .eth names (CCIP-Read)", () => {
+        expect(isDomainLike("test.offchaindemo.eth")).toBe(true);
+      });
+
+      it("should return true for DNS names imported into ENS", () => {
+        expect(isDomainLike("pokersback.com")).toBe(true);
+      });
+
+      it("should return false for strings without a dot", () => {
+        expect(isDomainLike("vitaliketh")).toBe(false);
+      });
+
+      it("should return false for strings that are too short", () => {
+        expect(isDomainLike("a.")).toBe(false);
+        expect(isDomainLike("ab")).toBe(false);
+      });
+
+      it("should return false for non-string inputs", () => {
+        expect(isDomainLike(undefined)).toBe(false);
+        expect(isDomainLike({ domain: "vitalik.eth" } as any)).toBe(false);
+      });
+    });
+
     describe("validateDomain", () => {
       it("should return true for a valid domain", () => {
         expect(validateDomain("vitalik.eth")).toBe(true);
